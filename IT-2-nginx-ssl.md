@@ -14,7 +14,7 @@
 
 Installs Nginx as the single HTTPS entry point for all container subdomains.
 Every role container gets its own subdomain mapped to a local port.
-SSL certificate covers `*.dev.nyota.sa` via Let's Encrypt wildcard.
+SSL certificate covers `*.dev.nyota.studio` via Let's Encrypt wildcard.
 HTTP on port 80 redirects to HTTPS. Certbot auto-renewal hook reloads Nginx after each renewal.
 
 ---
@@ -38,8 +38,8 @@ In Cloudflare DNS, create these two records (orange cloud proxy ON):
 
 | Type | Name | Value |
 |------|------|-------|
-| A | `*.dev.nyota.sa` | `46.224.122.127` |
-| A | `dev.nyota.sa` | `46.224.122.127` |
+| A | `*.dev.nyota.studio` | `46.224.122.127` |
+| A | `dev.nyota.studio` | `46.224.122.127` |
 
 Wait 2–5 minutes for propagation before running certbot.
 
@@ -53,12 +53,12 @@ Run interactively — certbot will ask you to add a DNS TXT record:
 
 ```bash
 certbot certonly --manual --preferred-challenges dns \
-  -d "*.dev.nyota.sa" -d "dev.nyota.sa"
+  -d "*.dev.nyota.studio" -d "dev.nyota.studio"
 ```
 
 When prompted, add the TXT record in Cloudflare DNS, wait 30 seconds, then press Enter to confirm.
 
-> **Note:** Dummy self-signed cert created at `/etc/letsencrypt/live/dev.nyota.sa/` during testing.
+> **Note:** Dummy self-signed cert created at `/etc/letsencrypt/live/dev.nyota.studio/` during testing.
 > Replace with real cert after DNS is configured. Real cert path will be the same.
 
 ---
@@ -70,27 +70,27 @@ All 18 container server blocks are defined. Port mapping:
 
 | Subdomain | Host Port |
 |-----------|-----------|
-| flutter1.dev.nyota.sa | 8801 |
-| flutter2.dev.nyota.sa | 8802 |
-| flutter3.dev.nyota.sa | 8803 |
-| arch1.dev.nyota.sa | 8810 |
-| arch2.dev.nyota.sa | 8811 |
-| plan1.dev.nyota.sa | 8820 |
-| plan2.dev.nyota.sa | 8821 |
-| back1.dev.nyota.sa | 8830 |
-| back2.dev.nyota.sa | 8831 |
-| back3.dev.nyota.sa | 8832 |
-| exec1.dev.nyota.sa | 8840 |
-| exec2.dev.nyota.sa | 8841 |
-| exec3.dev.nyota.sa | 8842 |
-| exec4.dev.nyota.sa | 8843 |
-| exec5.dev.nyota.sa | 8844 |
-| review.dev.nyota.sa | 8850 |
-| ux1.dev.nyota.sa | 8860 |
-| ux2.dev.nyota.sa | 8861 |
-| devops.dev.nyota.sa | 8870 |
-| litellm.dev.nyota.sa | 4000 |
-| cchv.dev.nyota.sa | 8900 |
+| flutter1.dev.nyota.studio | 8801 |
+| flutter2.dev.nyota.studio | 8802 |
+| flutter3.dev.nyota.studio | 8803 |
+| arch1.dev.nyota.studio | 8810 |
+| arch2.dev.nyota.studio | 8811 |
+| plan1.dev.nyota.studio | 8820 |
+| plan2.dev.nyota.studio | 8821 |
+| back1.dev.nyota.studio | 8830 |
+| back2.dev.nyota.studio | 8831 |
+| back3.dev.nyota.studio | 8832 |
+| exec1.dev.nyota.studio | 8840 |
+| exec2.dev.nyota.studio | 8841 |
+| exec3.dev.nyota.studio | 8842 |
+| exec4.dev.nyota.studio | 8843 |
+| exec5.dev.nyota.studio | 8844 |
+| review.dev.nyota.studio | 8850 |
+| ux1.dev.nyota.studio | 8860 |
+| ux2.dev.nyota.studio | 8861 |
+| devops.dev.nyota.studio | 8870 |
+| litellm.dev.nyota.studio | 4000 |
+| cchv.dev.nyota.studio | 8900 |
 
 To reload after any config change:
 ```bash
@@ -160,14 +160,14 @@ systemctl status certbot.timer | grep Active
 ```bash
 certbot certificates
 ```
-**Expected:** Certificate listed for `*.dev.nyota.sa` with valid future expiry  
+**Expected:** Certificate listed for `*.dev.nyota.studio` with valid future expiry  
 **Fail if:** No certificates found
 
 ---
 
 ### Test 7 — After real SSL cert from external (run from local machine)
 ```bash
-curl -I https://flutter1.dev.nyota.sa
+curl -I https://flutter1.dev.nyota.studio
 ```
 **Expected:** `502 Bad Gateway` with valid SSL (no certificate warning)  
 **Fail if:** SSL error or connection refused
@@ -193,8 +193,8 @@ curl -I https://flutter1.dev.nyota.sa
 Before running IT-3 (Cloudflare Zero Trust), the real SSL cert must be obtained.
 
 Steps:
-1. In Cloudflare DNS — add `A *.dev.nyota.sa → 46.224.122.127` and `A dev.nyota.sa → 46.224.122.127`
-2. Run: `certbot certonly --manual --preferred-challenges dns -d "*.dev.nyota.sa" -d "dev.nyota.sa"`
+1. In Cloudflare DNS — add `A *.dev.nyota.studio → 46.224.122.127` and `A dev.nyota.studio → 46.224.122.127`
+2. Run: `certbot certonly --manual --preferred-challenges dns -d "*.dev.nyota.studio" -d "dev.nyota.studio"`
 3. Add the TXT record Certbot shows, wait 30s, confirm
 4. Run: `nginx -s reload`
 5. Test: `certbot certificates` — must show valid cert
